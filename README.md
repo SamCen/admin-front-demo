@@ -27,5 +27,3 @@ yarn run lint
 
 ### Customize configuration
 See [Configuration Reference](https://cli.vuejs.org/config/).
-# admin-front-demo
-vue admin demo
