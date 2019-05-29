@@ -5,17 +5,19 @@
 </template>
 
 <script>
-import HelloWorld from './components/HelloWorld.vue';
 
 export default {
   name: 'app',
-  components: {
-    HelloWorld,
-  },
 };
 </script>
 
 <style>
+  body,html{
+    height: 100%;
+  }
+  #app{
+    height: 100%;
+  }
   *{
     margin: 0;
     padding: 0;
