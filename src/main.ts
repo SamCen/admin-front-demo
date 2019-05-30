@@ -1,10 +1,10 @@
 import Vue from 'vue';
-import './plugins/axios'
 import App from './App.vue';
 import router from './router';
 import store from './store';
 import './registerServiceWorker';
 import './plugins/element.js';
+import './assets/iconfont/iconfont.css';
 
 Vue.config.productionTip = false;
 

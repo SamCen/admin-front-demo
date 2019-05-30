@@ -17,8 +17,8 @@
 </template>
 
 <script>
-    import AppHeader from '../components/AppHeader';
-    import AppMenu from '../components/AppMenu';
+    import AppHeader from '@/components/AppHeader';
+    import AppMenu from '@/components/AppMenu';
     export default {
         components:{
             AppHeader:AppHeader,

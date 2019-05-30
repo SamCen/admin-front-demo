@@ -26,6 +26,7 @@
 </template>
 
 <script>
+    import api from '@/apis/index';
     export default {
         name: 'Login',
         data() {
@@ -50,7 +51,11 @@
             loginSubmit() {
                 this.$refs['loginForm'].validate((valid) => {
                     if (valid) {
-                        alert('submit!');
+                        api.auth.login(this.loginForm).then(response=>{
+                            console.log(response);
+                        }).catch(error=>{
+                            this.$message.error(error.response.data.msg);
+                        })
                     }
                 });
             },
@@ -66,7 +71,7 @@
         position: fixed;
         width: 100%;
         height: 100%;
-        background: #59b7f8;
+        background: #409EFF;
     }
 
     .login-panel {
@@ -87,13 +92,13 @@
 
     .el-header {
         background-color: #FFFFFF;
-        color: #59b7f8;
+        color: #409EFF;
         text-align: center;
         line-height: 60px;
     }
 
     .submit {
         width: 100%;
-        background: #59b7f8;
+        background: #409EFF;
     }
 </style>
