@@ -5,7 +5,7 @@
                 <el-header>
                     <h3>后台管理系统</h3>
                 </el-header>
-                <el-container>
+                <el-container v-loading="loading">
                     <el-main>
                         <el-form :label-position="labelPosition" :rules="loginRules" ref="loginForm" :model="loginForm">
                             <el-form-item prop="account">
@@ -26,11 +26,14 @@
 </template>
 
 <script>
-    import api from '@/apis/index';
+    import router from '../router';
+    import { mapActions, mapState, mapGetters, mapMutations } from 'vuex';
+    import RouterGenerator from '@/utils/generateRouter';
     export default {
         name: 'Login',
         data() {
             return {
+                loading:false,
                 labelPosition: 'right',
                 loginForm: {
                     account: '',
@@ -48,20 +51,64 @@
             };
         },
         methods: {
+            ...mapMutations([
+                'SET_LOGIN_FAIL'
+            ]),
+            ...mapActions([
+                'login',
+                'getMenus'
+            ]),
             loginSubmit() {
                 this.$refs['loginForm'].validate((valid) => {
                     if (valid) {
-                        api.auth.login(this.loginForm).then(response=>{
-                            console.log(response);
-                        }).catch(error=>{
-                            this.$message.error(error.response.data.msg);
-                        })
+                        this.loading = true;
+                        this.login(this.loginForm);
+                    } else {
+                        return false;
                     }
                 });
             },
+            registerRouter () {
+                let routers = [];
+                //调用路由生成器
+                RouterGenerator(routers, this.userInfo);
+                //添加路由到/admin 路由的children
+                router.options.routes[0].children = routers;
+                //注册路由
+                router.addRoutes(router.options.routes);
+            }
         },
-        mounted() {
+        watch: {
 
+            access_token () {
+                this.getMenus();
+            },
+
+            userInfo () {
+                this.loading = false;
+                this.registerRouter();
+                this.$router.replace({
+                    path: '/'
+                })
+            },
+
+            loginFail (value) {
+                if (value) {
+                    this.$message.error(value);
+                    this.loading = false;
+                }
+                this.SET_LOGIN_FAIL();
+            }
+        },
+        computed: {
+            ...mapState ({
+                access_token: state => state.auth.access_token,
+                userInfo: state => state.auth.userInfo,
+                loginFail: state => state.auth.loginFail
+            }),
+            ...mapGetters ([
+                'userInfo'
+            ])
         }
     };
 </script>

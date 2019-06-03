@@ -6,7 +6,15 @@ export default {
      * @param params
      * @returns {AxiosPromise<any>}
      */
-    login(params){
+    login(params) {
         return axios.post('backend/auth/login', params);
+    },
+
+    /**
+     * 获取菜单
+     * @returns {AxiosPromise<any>}
+     */
+    getUserInfo() {
+        return axios.get('backend/auth/detail');
     }
 }
