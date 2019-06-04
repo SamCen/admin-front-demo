@@ -15,6 +15,6 @@ export default {
      * @returns {AxiosPromise<any>}
      */
     getUserInfo() {
-        return axios.get('backend/auth/detail');
+        return axios.get('backend/user/info ');
     }
 }

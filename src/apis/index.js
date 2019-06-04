@@ -9,6 +9,7 @@ axios.interceptors.request.use(config => {
     const access_token = store.state.auth.access_token;
 
     if (access_token) {
+        config.headers.Accept = 'application/json';
         config.headers.Authorization = `Bearer ${access_token}`;
     }
     return config;

@@ -8,7 +8,7 @@
         <div class="userinfo-submenu">
             <el-dropdown>
         <span class="el-dropdown-link">
-          <span>test</span>
+          <span>{{ userInfo ? userInfo.name : '' }}</span>
           <i class="el-icon-arrow-down el-icon--right"></i>
         </span>
                 <el-dropdown-menu slot="dropdown">
@@ -22,8 +22,16 @@
 </template>
 
 <script>
+    import { mapState } from 'vuex';
+
     export default {
-        name: "AppHeader"
+        name: "AppHeader",
+        computed: {
+            ...mapState ({
+                access_token: state => state.auth.access_token,
+                userInfo: state => state.auth.userInfo,
+            })
+        }
     }
 </script>
 

@@ -12,7 +12,7 @@ export default {
     },
     getters: {
         menus: state => {
-            return state.menus ? state.menus : [];
+            return state.userInfo.menus ? state.userInfo.menus : [];
         },
     },
     mutations: {
@@ -49,6 +49,8 @@ export default {
         getInfo({commit}) {
             api.auth.getUserInfo().then(response => {
                 commit(types.SET_MENUS, response.data.data);
+            }).catch(errors => {
+                commit(types.SET_LOGIN_FAIL, errors.response.data.msg);
             });
         },
     }

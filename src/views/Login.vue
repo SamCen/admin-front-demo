@@ -56,7 +56,7 @@
             ]),
             ...mapActions([
                 'login',
-                'getMenus'
+                'getInfo'
             ]),
             loginSubmit() {
                 this.$refs['loginForm'].validate((valid) => {
@@ -71,7 +71,7 @@
             registerRouter () {
                 let routers = [];
                 //调用路由生成器
-                RouterGenerator(routers, this.userInfo);
+                RouterGenerator(routers, this.menus);
                 //添加路由到/admin 路由的children
                 router.options.routes[0].children = routers;
                 //注册路由
@@ -81,7 +81,7 @@
         watch: {
 
             access_token () {
-                this.getMenus();
+                this.getInfo();
             },
 
             userInfo () {
@@ -104,12 +104,12 @@
             ...mapState ({
                 access_token: state => state.auth.access_token,
                 userInfo: state => state.auth.userInfo,
-                loginFail: state => state.auth.loginFail
+                loginFail: state => state.auth.loginFail,
             }),
             ...mapGetters ([
-                'userInfo'
-            ])
-        }
+                'menus',
+            ]),
+        },
     };
 </script>
 
