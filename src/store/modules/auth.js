@@ -12,7 +12,7 @@ export default {
     },
     getters: {
         menus: state => {
-            return state.userInfo.menus ? state.userInfo.menus : [];
+            return state.userInfo?(state.userInfo.menus?state.userInfo.menus:[]) : [];
         },
     },
     mutations: {

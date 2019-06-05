@@ -5,7 +5,9 @@
             background-color="#FFFFFF"
             text-color="#409EFF"
             active-text-color="#FFF"
-            :router="true">
+            :default-active="active"
+            :router="true"
+            >
         <el-menu-item :index="item.path" v-if="!item.children" v-for="item in menus" :key="item.id">
             <i class="iconfont" :class="item.icon"></i>
             <span slot="title">{{ item.name }}</span>
@@ -24,14 +26,17 @@
     </div>
 </template>
 <script>
-    import { mapGetters, mapState } from 'vuex'
+    import { mapGetters, mapState } from 'vuex';
 
     export default {
         name: "AppMenu",
         data() {
             return {
-                active: ''
+                active:'',
             }
+        },
+        methods:{
+
         },
         computed: {
             ...mapGetters([
@@ -44,8 +49,11 @@
         watch: {
             //获取当前URL
             route () {
-                this.active = window.location.hash.substr(8);
+                this.active = window.location.pathname;
             }
+        },
+        mounted(){
+            this.active = window.location.pathname;
         }
     }
 </script>

@@ -39,6 +39,7 @@
         box-shadow: 0 2px 12px 0 rgba(0,0,0,0.12);
         margin-right: 10px;
         overflow-y: scroll;
+        background: #ffffff;
     }
     .main{
         height: 100%;
