@@ -16,5 +16,13 @@ export default {
      */
     getUserInfo() {
         return axios.get('backend/user/info ');
+    },
+
+    /**
+     *  退出登录
+     * @returns {AxiosPromise<any>}
+     */
+    logout(){
+        return axios.post('backend/auth/logout');
     }
 }

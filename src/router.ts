@@ -4,7 +4,6 @@ import store from './store'
 import RouterGenerator from '@/utils/generateRouter'
 
 
-
 Vue.use(Router);
 
 let dynamic = [];
@@ -44,7 +43,7 @@ const router =  new Router({
                  */
                 if (store.state.auth.access_token) {
                     router.replace({
-                        path: '/'
+                        path: '/home'
                     })
                 } else {
                     next();

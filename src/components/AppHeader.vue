@@ -6,32 +6,51 @@
         <div class="header-info">
         </div>
         <div class="userinfo-submenu">
-            <el-dropdown>
-        <span class="el-dropdown-link">
-          <span>{{ userInfo ? userInfo.name : '' }}</span>
-          <i class="el-icon-arrow-down el-icon--right"></i>
-        </span>
-                <el-dropdown-menu slot="dropdown">
-                    <el-dropdown-item>修改密码</el-dropdown-item>
-                    <el-dropdown-item>个人资料</el-dropdown-item>
-                    <el-dropdown-item >退出</el-dropdown-item>
-                </el-dropdown-menu>
-            </el-dropdown>
+        <el-dropdown  @command="handleCommand">
+            <span class="el-dropdown-link">
+              <span>{{ userInfo ? userInfo.name : '' }}</span>
+              <i class="el-icon-arrow-down el-icon--right"></i>
+            </span>
+            <el-dropdown-menu slot="dropdown">
+                <el-dropdown-item>修改密码</el-dropdown-item>
+                <el-dropdown-item>个人资料</el-dropdown-item>
+                <el-dropdown-item command="logout" devided>退出</el-dropdown-item>
+            </el-dropdown-menu>
+        </el-dropdown>
         </div>
     </div>
 </template>
 
 <script>
-    import { mapState } from 'vuex';
+    import {mapState, mapActions} from 'vuex';
 
     export default {
         name: "AppHeader",
         computed: {
-            ...mapState ({
+            ...mapState({
                 access_token: state => state.auth.access_token,
                 userInfo: state => state.auth.userInfo,
             })
-        }
+        },
+        methods: {
+            ...mapActions([
+                'logout',
+            ]),
+            handleCommand(command) {
+                if(command == 'logout'){
+                    this.logout();
+                };
+            }
+        },
+        watch: {
+            access_token(value) {
+                if (!value) {
+                    this.$router.replace({
+                        path: '/login'
+                    })
+                }
+            }
+        },
     }
 </script>
 

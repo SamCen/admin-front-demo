@@ -16,7 +16,7 @@ export default {
         },
     },
     mutations: {
-        SET_MENUS: (state, menus = null) => {
+        SET_USER: (state, menus = null) => {
             Vue.set(state, 'userInfo', menus);
             if (menus) {
                 sessionStorage.setItem('userInfo', JSON.stringify(menus));
@@ -48,10 +48,16 @@ export default {
 
         getInfo({commit}) {
             api.auth.getUserInfo().then(response => {
-                commit(types.SET_MENUS, response.data.data);
+                commit(types.SET_USER, response.data.data);
             }).catch(errors => {
                 commit(types.SET_LOGIN_FAIL, errors.response.data.msg);
             });
         },
+        logout ({ commit }) {
+            api.auth.logout().then(response => {
+                commit(types.SET_TOKEN, null);
+                commit(types.SET_USER, null);
+            })
+        }
     }
 }
