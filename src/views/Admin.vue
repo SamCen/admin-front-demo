@@ -19,7 +19,7 @@
                             </el-form-item>
                             <el-form-item label="">
                                 <el-button type="primary" @click="queryIndex">查询</el-button>
-                                <el-button type="success" @click="queryIndex">添加</el-button>
+                                <el-button type="success" @click="addAction">添加</el-button>
                             </el-form-item>
                         </el-form>
                     </el-col>
@@ -147,6 +147,11 @@
                             inactive-text="禁用">
                     </el-switch>
                 </el-form-item>
+                <el-form-item label="角色：" >
+                    <el-checkbox-group v-model="addUserRoles">
+                        <el-checkbox v-for="item in roleIndexData.data" :label="item.id" >{{item.name}}</el-checkbox>
+                    </el-checkbox-group>
+                </el-form-item>
                 <el-form-item label="" >
                     <el-button @click="addCancelDialog">取 消</el-button>
                     <el-button type="primary" @click="addUser">提交</el-button>
@@ -189,7 +194,6 @@
                     last_login_ip: '',
                     status: '',
                     roles: [],
-
                 },
                 //当前选中的角色
                 activeRoles:[],
@@ -210,6 +214,18 @@
                 },
                 //添加用户所选角色
                 addUserRoles:[],
+                //添加验证规则
+                addRules: {
+                    name: [
+                        { required: true, message: '请输入名称', trigger: 'blur' },
+                    ],
+                    account: [
+                        { required: true, message: '请输入账号', trigger: 'blur' }
+                    ],
+                    password: [
+                        { required: true, message: '请输入账号', trigger: 'blur' }
+                    ],
+                }
 
             };
         },
@@ -314,11 +330,40 @@
                 this.showDialogVisible = false;
                 this.showHandleClosed();
             },
+            /**
+             * 关闭添加对话框
+             */
             addHandleClose(){
-
+                this.addDialogVisible = false;
             },
+            /**
+             * 添加对话框关闭完成后
+             */
             addHandleClosed(){
-
+                this.addUserRoles = [];
+            },
+            /**
+             * 添加对话框取消按钮
+             */
+            addCancelDialog(){
+                this.addDialogVisible = false;
+            },
+            /**
+             * 请求添加用户
+             */
+            addUser(){
+                console.log(this.addParams);
+            },
+            /**
+             * 打开添加对话框
+             */
+            addAction(){
+                this.addDialogVisible = true;
+                this.roleIndexData.data = [];
+                this.addUserRoles = [];
+                api.role.index({}).then(res => {
+                    this.roleIndexData.data = res.data.data;
+                })
             },
         },
         mounted() {
