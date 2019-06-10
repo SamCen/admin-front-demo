@@ -17,8 +17,9 @@
                                     <el-option label="禁用" value="0"></el-option>
                                 </el-select>
                             </el-form-item>
-                            <el-form-item>
+                            <el-form-item label="">
                                 <el-button type="primary" @click="queryIndex">查询</el-button>
+                                <el-button type="success" @click="queryIndex">添加</el-button>
                             </el-form-item>
                         </el-form>
                     </el-col>
@@ -77,11 +78,11 @@
         </el-card>
         <!--详情对话框-->
         <el-dialog
-                title=""
+                title="用户详情"
                 :visible.sync="showDialogVisible"
                 width="30%"
                 :before-close="showHandleClose"
-                @closed="handleClosed">
+                @closed="showHandleClosed">
             <el-tabs v-model="activeName" tab-position="left">
                 <el-tab-pane label="基础信息" name="info" >
                     <el-form :model="showData" ref="showForm" label-width="100px">
@@ -102,11 +103,10 @@
                             </el-switch>
                         </el-form-item>
                         <el-form-item label="" >
-                            <el-button @click="cancelDialog">取 消</el-button>
-                            <el-button type="primary" @click="editInfo">修 改</el-button>
+                            <el-button @click="showCancelDialog">取 消</el-button>
+                            <el-button type="primary" @click="editInfo">修改基础信息</el-button>
                         </el-form-item>
                     </el-form>
-
                 </el-tab-pane>
                 <el-tab-pane label="角色管理" name="role">
                     <el-form label-width="100px">
@@ -116,12 +116,42 @@
                             </el-checkbox-group>
                         </el-form-item>
                         <el-form-item label="" >
-                            <el-button @click="cancelDialog">取 消</el-button>
-                            <el-button type="primary" @click="editRole">修 改</el-button>
+                            <el-button @click="showCancelDialog">取 消</el-button>
+                            <el-button type="primary" @click="editRole">修改关联角色</el-button>
                         </el-form-item>
                     </el-form>
                 </el-tab-pane>
             </el-tabs>
+        </el-dialog>
+
+        <el-dialog
+                title="添加账号"
+                :visible.sync="addDialogVisible"
+                width="30%"
+                :before-close="addHandleClose"
+                @closed="addHandleClosed">
+            <el-form :model="addParams" ref="addForm" label-width="100px">
+                <el-form-item label="名称：" prop="name">
+                    <el-input v-model="addParams.name"></el-input>
+                </el-form-item>
+                <el-form-item label="账号：" prop="account">
+                    <el-input v-model="addParams.account"></el-input>
+                </el-form-item>
+                <el-form-item label="密码：" prop="password">
+                    <el-input v-model="addParams.password" show-password></el-input>
+                </el-form-item>
+                <el-form-item label="状态：" prop="status">
+                    <el-switch
+                            v-model="addParams.status"
+                            active-text="启用"
+                            inactive-text="禁用">
+                    </el-switch>
+                </el-form-item>
+                <el-form-item label="" >
+                    <el-button @click="addCancelDialog">取 消</el-button>
+                    <el-button type="primary" @click="addUser">提交</el-button>
+                </el-form-item>
+            </el-form>
         </el-dialog>
     </div>
 </template>
@@ -165,11 +195,21 @@
                 activeRoles:[],
                 //详情对话框隐藏状态
                 showDialogVisible: false,
-
                 //角色列表数据(不需要分页)
                 roleIndexData:{
                     data:[],
                 },
+                //添加对话框隐藏状态
+                addDialogVisible:false,
+                //添加用户数据
+                addParams:{
+                    account:'',
+                    name:'',
+                    password:'',
+                    status:true,
+                },
+                //添加用户所选角色
+                addUserRoles:[],
 
             };
         },
@@ -237,7 +277,7 @@
                 this.showDialogVisible = false;
 
             },
-            handleClosed(){
+            showHandleClosed(){
                 this.showIndex = 0;
                 this.activeName = 'info';
             },
@@ -249,7 +289,7 @@
                     this.$message.success('修改成功');
                     this.showDialogVisible = false;
                     this.queryIndex();
-                    this.handleClosed();
+                    this.showHandleClosed();
                 }).catch(err=>{
                     this.$message.error('网络异常');
                 })
@@ -262,15 +302,23 @@
                     this.$message.success('修改成功');
                     this.showDialogVisible = false;
                     this.queryIndex();
-                    this.handleClosed();
-
+                    this.showHandleClosed();
                 }).catch(err=>{
                     this.$message.error('网络异常');
                 });
             },
-            cancelDialog(){
+            /**
+             * 详情取消对话框
+             */
+            showCancelDialog(){
                 this.showDialogVisible = false;
-                this.handleClosed();
+                this.showHandleClosed();
+            },
+            addHandleClose(){
+
+            },
+            addHandleClosed(){
+
             },
         },
         mounted() {
