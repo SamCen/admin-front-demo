@@ -1,112 +1,141 @@
 <template>
     <div>
-    <el-card class="box-card">
-        <div slot="header" class="clearfix">
-            <h3 class="page-title">后台用户列表</h3>
-        </div>
-        <div>
-            <el-row :gutter="20" type="flex" justify="space-between">
-                <el-col>
-                    <el-form :inline="true" :model="queryParams" class="demo-form-inline" label-width="100px">
-                        <el-form-item label="账号">
-                            <el-input v-model="queryParams.account" placeholder="账号"></el-input>
+        <el-card class="box-card">
+            <div slot="header" class="clearfix">
+                <h3 class="page-title">后台用户列表</h3>
+            </div>
+            <div>
+                <el-row :gutter="20" type="flex" justify="space-between">
+                    <el-col>
+                        <el-form :inline="true" :model="queryParams" class="demo-form-inline" label-width="100px">
+                            <el-form-item label="账号">
+                                <el-input v-model="queryParams.account" placeholder="账号" clearable></el-input>
+                            </el-form-item>
+                            <el-form-item label="状态">
+                                <el-select v-model="queryParams.status" placeholder="用户状态" clearable>
+                                    <el-option label="启用" value="1"></el-option>
+                                    <el-option label="禁用" value="0"></el-option>
+                                </el-select>
+                            </el-form-item>
+                            <el-form-item>
+                                <el-button type="primary" @click="queryIndex">查询</el-button>
+                            </el-form-item>
+                        </el-form>
+                    </el-col>
+                </el-row>
+                <el-row>
+                    <el-table
+                            :data="userIndexData.list"
+                            stripe
+                            style="width: 100%">
+                        <el-table-column
+                                prop="id"
+                                label="ID"
+                        >
+                        </el-table-column>
+                        <el-table-column
+                                prop="account"
+                                label="账号"
+                        >
+                        </el-table-column>
+                        <el-table-column
+                                prop="name"
+                                label="姓名"
+                        >
+                        </el-table-column>
+                        <el-table-column
+                                prop="last_login_ip"
+                                label="上次登录ip"
+                        >
+                        </el-table-column>
+                        <el-table-column
+                                label="状态">
+                            <template slot-scope="scope">
+                                {{scope.row.status ? '启用':'禁用'}}
+                            </template>
+                        </el-table-column>
+                        <el-table-column
+                                label="操作">
+                            <template slot-scope="scope">
+                                <i class="el-icon-edit-outline" @click="showAction(scope.$index)"></i>
+                            </template>
+                        </el-table-column>
+                    </el-table>
+                    <div class="page-block">
+                        <el-pagination
+                                @size-change="handleSizeChange"
+                                @current-change="handleCurrentChange"
+                                :current-page="this.queryParams.page"
+                                :page-sizes="[10, 20, 50, 100]"
+                                :page-size="this.queryParams.size"
+                                layout="total, sizes, prev, pager, next, jumper"
+                                :total="this.userIndexData.total">
+                        </el-pagination>
+                    </div>
+                </el-row>
+            </div>
+        </el-card>
+        <!--详情对话框-->
+        <el-dialog
+                title=""
+                :visible.sync="showDialogVisible"
+                width="30%"
+                :before-close="showHandleClose"
+                @closed="handleClosed">
+            <el-tabs v-model="activeName" tab-position="left">
+                <el-tab-pane label="基础信息" name="info" >
+                    <el-form :model="showData" ref="showForm" label-width="100px">
+                        <el-form-item label="名称：" prop="name">
+                            <el-input v-model="showData.name"></el-input>
                         </el-form-item>
-                        <el-form-item label="状态">
-                            <el-select v-model="queryParams.status" placeholder="用户状态">
-                                <el-option label="启用" value="1"></el-option>
-                                <el-option label="禁用" value="0"></el-option>
-                            </el-select>
+                        <el-form-item label="账号：" prop="account">
+                            <el-input v-model="showData.account"></el-input>
                         </el-form-item>
-                        <el-form-item>
-                            <el-button type="primary" @click="queryIndex">查询</el-button>
+                        <el-form-item label="密码：" prop="password">
+                            <el-input v-model="showData.password"></el-input>
+                        </el-form-item>
+                        <el-form-item label="状态：" prop="status">
+                            <el-switch
+                                    v-model="showData.status"
+                                    active-text="启用"
+                                    inactive-text="禁用">
+                            </el-switch>
+                        </el-form-item>
+                        <el-form-item label="" >
+                            <el-button @click="cancelDialog">取 消</el-button>
+                            <el-button type="primary" @click="editInfo">修 改</el-button>
                         </el-form-item>
                     </el-form>
-                </el-col>
-            </el-row>
-            <el-row>
-                <el-table
-                        :data="indexData.list"
-                        stripe
-                        style="width: 100%">
-                    <el-table-column
-                            prop="id"
-                            label="ID"
-                    >
-                    </el-table-column>
-                    <el-table-column
-                            prop="account"
-                            label="账号"
-                    >
-                    </el-table-column>
-                    <el-table-column
-                            prop="name"
-                            label="姓名"
-                    >
-                    </el-table-column>
-                    <el-table-column
-                            prop="last_login_ip"
-                            label="上次登录ip"
-                    >
-                    </el-table-column>
-                    <el-table-column
-                            label="状态">
-                        <template slot-scope="scope">
-                            {{scope.row.status ? '启用':'禁用'}}
-                        </template>
-                    </el-table-column>
-                    <el-table-column
-                            label="操作">
-                        <template slot-scope="scope">
-                            <i class="el-icon-edit-outline" @click="showAction(scope.row.id)"></i>
-                        </template>
-                    </el-table-column>
-                </el-table>
-                <div class="page-block">
-                    <el-pagination
-                            @size-change="handleSizeChange"
-                            @current-change="handleCurrentChange"
-                            :current-page="this.queryParams.page"
-                            :page-sizes="[10, 20, 50, 100]"
-                            :page-size="this.queryParams.size"
-                            layout="total, sizes, prev, pager, next, jumper"
-                            :total="this.indexData.total">
-                    </el-pagination>
-                </div>
-            </el-row>
-        </div>
-    </el-card>
-    <!--详情对话框-->
-    <el-dialog
-            title=""
-            :visible.sync="showDialogVisible"
-            width="30%"
-            :before-close="showHandleClose">
-        <el-form :model="showData" ref="showForm" label-width="100px" >
-            <el-form-item label="名称" prop="name">
-                <el-input v-model="showData.name"></el-input>
-            </el-form-item>
-            <el-form-item label="账号" prop="account">
-                <el-input v-model="showData.account"></el-input>
-            </el-form-item>
-            <el-form-item label="上次登录时间" prop="last_login_ip">
-                <el-input v-model="showData.last_login_ip"></el-input>
-            </el-form-item>
-        </el-form>
-        <span slot="footer" class="dialog-footer">
-            <el-button @click="showDialogVisible = false">取 消</el-button>
-            <el-button type="primary" @click="showDialogVisible = false">确 定</el-button>
-        </span>
-    </el-dialog>
+
+                </el-tab-pane>
+                <el-tab-pane label="角色管理" name="role">
+                    <el-form label-width="100px">
+                        <el-form-item label="角色：" >
+                            <el-checkbox-group v-model="activeRoles">
+                                <el-checkbox v-for="item in roleIndexData.data" :label="item.id" >{{item.name}}</el-checkbox>
+                            </el-checkbox-group>
+                        </el-form-item>
+                        <el-form-item label="" >
+                            <el-button @click="cancelDialog">取 消</el-button>
+                            <el-button type="primary" @click="editRole">修 改</el-button>
+                        </el-form-item>
+                    </el-form>
+                </el-tab-pane>
+            </el-tabs>
+        </el-dialog>
     </div>
 </template>
 
 <script>
     import api from '@/apis/index';
-
     export default {
         name: "Admin",
         data() {
             return {
+                //表格数据下表
+                showIndex:0,
+                //详情选项卡默认值
+                activeName:'info',
                 //列表加载
                 indexLoading: false,
                 //列表请求参数
@@ -116,8 +145,8 @@
                     status: '',
                     account: '',
                 },
-                //列表数据
-                indexData: {
+                //用户列表数据
+                userIndexData: {
                     list: [],
                     total: 0,
                 },
@@ -126,12 +155,21 @@
                     id: '',
                     name: '',
                     account: '',
+                    password:'',
                     last_login_ip: '',
                     status: '',
                     roles: [],
+
                 },
+                //当前选中的角色
+                activeRoles:[],
                 //详情对话框隐藏状态
                 showDialogVisible: false,
+
+                //角色列表数据(不需要分页)
+                roleIndexData:{
+                    data:[],
+                },
 
             };
         },
@@ -142,10 +180,10 @@
             queryIndex() {
                 this.indexLoading = true;
                 api.user.index(this.queryParams).then(response => {
-                    this.indexData = response.data.data;
+                    this.userIndexData = response.data.data;
                     this.indexLoading = false;
                 }).catch(error => {
-                    this.$message('网络异常');
+                    this.$message.error('网络异常');
                     this.indexLoading = false;
                 })
             },
@@ -167,19 +205,72 @@
             },
             /**
              * 点击编辑按钮
-             * @param id
+             * @param index
              */
-            showAction(id) {
+            showAction(index) {
+                this.showIndex = index;
+                let id = this.userIndexData.list[index].id;
+                this.roleIndexData.data = [];
+                this.activeRoles = [];
                 api.user.show(id).then(response => {
                     this.showData = response.data.data;
-                    this.showDialogVisible = true;
-                })
+                    this.showData.passwrod = '';
+                    api.role.index({}).then(res => {
+                        this.roleIndexData.data = res.data.data;
+                        for(let i in this.roleIndexData.data){
+                            for (let j in this.showData.roles){
+                                this.roleIndexData.data[i].id =  this.roleIndexData.data[i].id.toString();
+                                if(this.showData.roles[j].id == this.roleIndexData.data[i].id){
+                                    this.activeRoles.push(this.roleIndexData.data[i].id)
+                                }
+                            }
+                        }
+                        this.showDialogVisible = true;
+                    })
+                });
+
             },
             /**
              * 关闭详情对话框
              */
             showHandleClose() {
                 this.showDialogVisible = false;
+
+            },
+            handleClosed(){
+                this.showIndex = 0;
+                this.activeName = 'info';
+            },
+            /**
+             * 提交修改用户
+             */
+            editInfo(){
+                api.user.update(this.showData.id,this.showData).then(response=>{
+                    this.$message.success('修改成功');
+                    this.showDialogVisible = false;
+                    this.queryIndex();
+                    this.handleClosed();
+                }).catch(err=>{
+                    this.$message.error('网络异常');
+                })
+            },
+            /**
+             * 提交修改用户角色
+             */
+            editRole(){
+                api.user.updateRole(this.showData.id,this.activeRoles).then(response=>{
+                    this.$message.success('修改成功');
+                    this.showDialogVisible = false;
+                    this.queryIndex();
+                    this.handleClosed();
+
+                }).catch(err=>{
+                    this.$message.error('网络异常');
+                });
+            },
+            cancelDialog(){
+                this.showDialogVisible = false;
+                this.handleClosed();
             },
         },
         mounted() {

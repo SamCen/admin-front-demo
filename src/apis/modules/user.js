@@ -19,5 +19,25 @@ export default {
      */
     show(id){
         return axios.get(`backend/user/${id}`)
+    },
+
+    /**
+     * 修改用户基本信息
+     * @param id
+     * @param params
+     * @returns {AxiosPromise<any>}
+     */
+    update(id,params){
+        return axios.put(`backend/user/${id}`,params);
+    },
+
+    /**
+     * 修改用户关联角色
+     * @param id
+     * @param roles
+     * @returns {AxiosPromise<any>}
+     */
+    updateRole(id,roles){
+        return axios.put(`backend/user/updateRole/${id}`,{roles:roles});
     }
 }
