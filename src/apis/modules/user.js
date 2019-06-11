@@ -39,5 +39,14 @@ export default {
      */
     updateRole(id,roles){
         return axios.put(`backend/user/updateRole/${id}`,{roles:roles});
+    },
+
+    /**
+     * 添加用户
+     * @param params
+     * @returns {AxiosPromise<any>}
+     */
+    create(params){
+        return axios.post('backend/user', params)
     }
 }

@@ -17,7 +17,7 @@ export default {
   }
   #app{
     height: 100%;
-    background: #f2f2f2;
+    background: #f6f7f7;
   }
   *{
     margin: 0;

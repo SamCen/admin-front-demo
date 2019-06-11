@@ -85,7 +85,7 @@
                 @closed="showHandleClosed">
             <el-tabs v-model="activeName" tab-position="left">
                 <el-tab-pane label="基础信息" name="info" >
-                    <el-form :model="showData" ref="showForm" label-width="100px">
+                    <el-form :model="showData"  ref="showForm" label-width="100px">
                         <el-form-item label="名称：" prop="name">
                             <el-input v-model="showData.name"></el-input>
                         </el-form-item>
@@ -130,7 +130,7 @@
                 width="30%"
                 :before-close="addHandleClose"
                 @closed="addHandleClosed">
-            <el-form :model="addParams" ref="addForm" label-width="100px">
+            <el-form :model="addParams" :rules="addRules" ref="addForm" label-width="100px">
                 <el-form-item label="名称：" prop="name">
                     <el-input v-model="addParams.name"></el-input>
                 </el-form-item>
@@ -223,7 +223,7 @@
                         { required: true, message: '请输入账号', trigger: 'blur' }
                     ],
                     password: [
-                        { required: true, message: '请输入账号', trigger: 'blur' }
+                        { required: true, message: '请输入密码', trigger: 'blur' }
                     ],
                 }
 
@@ -293,6 +293,9 @@
                 this.showDialogVisible = false;
 
             },
+            /**
+             * 详情对话框关闭之后
+             */
             showHandleClosed(){
                 this.showIndex = 0;
                 this.activeName = 'info';
@@ -352,7 +355,26 @@
              * 请求添加用户
              */
             addUser(){
-                console.log(this.addParams);
+                this.$refs['addForm'].validate((valid) => {
+                    if (valid) {
+                        this.addParams.roles = this.addUserRoles;
+                        api.user.create(this.addParams).then(response=>{
+                            this.$message.success('添加成功');
+                            this.queryIndex();
+                            this.addParams = {
+                                account:'',
+                                name:'',
+                                password:'',
+                                status:true,
+                            };
+                            this.addDialogVisible = false;
+                        }).catch(err=>{
+                            this.$message.error('网络异常');
+                        })
+                    } else {
+                        this.$message.warning('资料不完善');
+                    }
+                });
             },
             /**
              * 打开添加对话框

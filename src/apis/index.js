@@ -2,6 +2,7 @@ import axios from 'axios';
 import auth from './modules/auth';
 import user from './modules/user';
 import role from './modules/role';
+import privilege from './modules/privilege';
 import store from '../store';
 
 
@@ -25,4 +26,5 @@ export default {
     auth,
     user,
     role,
+    privilege,
 }
