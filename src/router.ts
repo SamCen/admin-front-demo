@@ -8,7 +8,7 @@ Vue.use(Router);
 
 let dynamic = [];
 
-let menus = store.state.auth.userInfo ? store.state.auth.userInfo.menus : [];
+let menus = store.state["auth"].userInfo ? store.state["auth"].userInfo.menus : [];
 
 RouterGenerator(dynamic, menus);
 const router =  new Router({
@@ -22,7 +22,7 @@ const router =  new Router({
                 /**
                  * 验证用户是否登录
                  */
-                if (store.state.auth.access_token) {
+                if (store.state["auth"].access_token) {
                    next();
                 } else {
                     router.replace({
@@ -41,7 +41,7 @@ const router =  new Router({
                 /**
                  * 验证用户是否登录
                  */
-                if (store.state.auth.access_token) {
+                if (store.state["auth"].access_token) {
                     router.replace({
                         path: '/home'
                     })
