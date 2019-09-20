@@ -1,16 +1,15 @@
 import axios from 'axios';
-import auth from './modules/auth';
-import user from './modules/user';
-import role from './modules/role';
-import privilege from './modules/privilege';
-import store from '../store';
+import auth from '@/apis/modules/auth';
+import user from '@/apis/modules/user';
+import role from '@/apis/modules/role';
+import privilege from '@/apis/modules/privilege';
+import store from '@/store';
+import appConfig from '@/config';
 
-
-axios.defaults.baseURL = 'http://api.admin.com/';
+axios.defaults.baseURL = appConfig.BaseURL;
 
 axios.interceptors.request.use(config => {
     const access_token = store.state.auth.access_token;
-
     if (access_token) {
         config.headers.Accept = 'application/json';
         config.headers.Authorization = `Bearer ${access_token}`;

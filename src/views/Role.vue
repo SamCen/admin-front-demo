@@ -6,7 +6,7 @@
             </div>
             <div>
                 <el-row :gutter="20">
-                    <el-col :span="8"  :offset="2">
+                    <el-col :span="10" :offset="6">
                         <el-card class="box-card">
                             <el-table
                                     border
@@ -63,20 +63,24 @@
                             </div>
                         </el-card>
                     </el-col>
-                    <el-col :span="6"  :offset="2">
+
+                </el-row>
+                <br>
+                <el-row>
+                    <el-col :span="10" :offset="6">
                         <el-card class="box-card">
-                            <el-tree
-                                    :data="privilegeData"
-                                    show-checkbox
-                                    default-expand-all
-                                    node-key="code"
-                                    ref="tree"
-                                    highlight-current
-                                    :props="defaultProps"
-                                    style="margin-left: 100px;">
-                            </el-tree>
+                            <el-row  v-for = "(item,index) in privilegeData" :key="index">
+                                <el-checkbox-group v-model="privilegeGroup[index]" @change="handleCheckedPrivilegeChange(index,privilegeGroup[index])">
+                                    <el-checkbox :label="item.code">{{item.name}}</el-checkbox>
+                                    <br>
+                                    <el-checkbox v-for = "(childItem,childIndex) in item.children" :key="childIndex" :label="childItem.code" :disabled="checkAble[index]">
+                                        {{childItem.name}}
+                                    </el-checkbox>
+                                </el-checkbox-group>
+                                <br>
+                            </el-row>
                             <el-row>
-                                <el-col :span="8"  :offset="16">
+                                <el-col :span="8" :offset="16">
                                     <el-button type="primary" @click="updateRolePrivilege">保存角色权限</el-button>
                                 </el-col>
                             </el-row>
@@ -90,7 +94,7 @@
 
 <script>
     import api from '@/apis/index';
-
+    import Vue from 'vue';
     export default {
         name: "Role",
         data() {
@@ -111,12 +115,14 @@
                     children: 'children',
                     label: 'name'
                 },
+                checkAble:[],
                 //所有权限菜单数据
                 privilegeData: [],
                 //当前角色的权限
                 rolePrivilege: [],
                 //当前角色id
-                currentRoleId:0,
+                currentRoleId: 0,
+                privilegeGroup:[],
             }
         },
         methods: {
@@ -128,35 +134,84 @@
             queryPrivilegeIndex() {
                 api.privilege.index().then(response => {
                     this.privilegeData = response.data.data;
+                    for (let i = 0;i < this.privilegeData.length;i++ ){
+                        this.privilegeGroup[i] = [];
+                        this.checkAble[i] = true;
+                    }
                 })
             },
             handleCurrentRowChange(val) {
                 this.currentRoleId = 0;
                 this.rolePrivilege = [];
+                for (let i in this.privilegeGroup){
+                    Vue.set(this.privilegeGroup,i,[]);
+                }
                 api.role.show(val.id).then(response => {
-                    this.rolePrivilege = response.data.data.privileges;
-                    this.$refs.tree.setCheckedNodes(this.rolePrivilege)
-                })
+                    this.rolePrivilege = response.data.data.rolePrivileges;
+                    for (let i in this.rolePrivilege){
+                        for( let j in this.privilegeData){
+                            if(this.rolePrivilege[i].code === this.privilegeData[j].code){
+                                let rolePriGroup = [];
+                                rolePriGroup.push(this.rolePrivilege[i].code);
+                                if(this.rolePrivilege[i].children){
+                                    for (let k in this.rolePrivilege[i].children){
+                                        rolePriGroup.push(this.rolePrivilege[i].children[k].code);
+                                    }
+                                }
+                                Vue.set(this.privilegeGroup,j,rolePriGroup);
+                                this.handleCheckedPrivilegeChange(j,this.privilegeGroup[j])
+                            }
+
+                        }
+                    }
+                });
                 this.currentRoleId = val.id;
             },
-            handleSizeChange(size){
+            handleSizeChange(size) {
                 this.queryParams.size = size;
                 this.queryRoleIndex();
             },
-            handleCurrentPageChange(page){
+            handleCurrentPageChange(page) {
                 this.queryParams.page = page;
                 this.queryRoleIndex();
             },
-            updateRolePrivilege(){
-                if(this.currentRoleId == 0){
+            updateRolePrivilege() {
+                if(this.currentRoleId === 0){
                     this.$message.warning('请选择角色');
                     return false;
                 }
-                console.log('keys 获取');
-                console.log(this.$refs.tree.getCheckedKeys());
-                console.log('nodes 获取');
-                console.log(this.$refs.tree.getCheckedNodes());
-            }
+                let temp = [];
+                for (let i in this.privilegeGroup){
+                    temp = temp.concat(this.privilegeGroup[i]);
+                }
+                api.role.updatePri(this.currentRoleId,temp).then(response=>{
+                    this.$message.success('修改成功');
+                }).catch(err=>{
+                    this.$message.error('修改失败');
+
+                });
+            },
+            handleCheckedPrivilegeChange(index,val){
+                if(val.length === 1){
+                    if(this.privilegeData[index].code === val[0]){
+                        Vue.set(this.checkAble,index,false);
+                    }else{
+                        Vue.set(this.privilegeGroup,index,[]);
+                        Vue.set(this.checkAble,index,true);
+                    }
+                }
+                if(val.length === 0){
+                    Vue.set(this.checkAble,index,true);
+                }
+                if(val.length > 1){
+                    if(val.indexOf(this.privilegeData[index].code) === -1){
+                        Vue.set(this.privilegeGroup,index,[]);
+                        Vue.set(this.checkAble,index,true);
+                    }else{
+                        Vue.set(this.checkAble,index,false);
+                    }
+                }
+            },
         },
         mounted() {
             this.queryRoleIndex();

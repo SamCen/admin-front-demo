@@ -19,5 +19,15 @@ export default {
      */
     show(id){
         return axios.get(`backend/role/${id}`)
-    }
+    },
+
+    /**
+     * 更新角色权限
+     * @param id
+     * @param params
+     * @returns {AxiosPromise<any>}
+     */
+    updatePri(id,renew){
+        return axios.put(`backend/updatePri/${id}`,{renew})
+    },
 }
