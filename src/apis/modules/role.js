@@ -24,7 +24,7 @@ export default {
     /**
      * 更新角色权限
      * @param id
-     * @param params
+     * @param renew
      * @returns {AxiosPromise<any>}
      */
     updatePri(id,renew){
