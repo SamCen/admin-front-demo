@@ -3,7 +3,7 @@
     <el-menu
             :unique-opened="true"
             background-color="#FFFFFF"
-            text-color="#409EFF"
+            text-color="#19426d"
             active-text-color="#FFF"
             :default-active="active"
             :router="true"
@@ -60,6 +60,6 @@
 
 <style scoped>
     .el-menu-item.is-active{
-        background-color:#b3d8ff !important;
+        background-color:#3b6c9e !important;
     }
 </style>

@@ -118,7 +118,7 @@
         position: fixed;
         width: 100%;
         height: 100%;
-        background: #409EFF;
+        background: #19426d;
     }
 
     .login-panel {
@@ -139,13 +139,13 @@
 
     .el-header {
         background-color: #FFFFFF;
-        color: #409EFF;
+        color: #19426d;
         text-align: center;
         line-height: 60px;
     }
 
     .submit {
         width: 100%;
-        background: #409EFF;
+        background: #19426d;
     }
 </style>

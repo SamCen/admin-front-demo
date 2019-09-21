@@ -5,6 +5,11 @@
                 <h3 class="page-title">角色列表</h3>
             </div>
             <div>
+                <el-row>
+                    <el-col>
+                        <el-button type="primary" round @click="addRoleAction">添加角色</el-button>
+                    </el-col>
+                </el-row>
                 <el-row :gutter="20">
                     <el-col :span="10" :offset="6">
                         <el-card class="box-card">
@@ -89,6 +94,22 @@
                 </el-row>
             </div>
         </el-card>
+        <el-dialog
+                title="添加角色"
+                :visible.sync="addDialogVisible"
+                width="30%"
+                :before-close="addHandleClose"
+                @closed="addHandleClosed">
+            <el-form :model="addParams" :rules="addRules" ref="addForm" label-width="100px">
+                <el-form-item label="名称：" prop="name">
+                    <el-input v-model="addParams.name"></el-input>
+                </el-form-item>
+                <el-form-item label="" >
+                    <el-button @click="addCancelDialog">取 消</el-button>
+                    <el-button type="primary" @click="addRole">提交</el-button>
+                </el-form-item>
+            </el-form>
+        </el-dialog>
     </div>
 </template>
 
@@ -104,6 +125,16 @@
                     page: 1,
                     size: 10,
                     with: 'admins'
+                },
+                //添加参数
+                addParams:{
+                    name:'',
+                },
+                //添加验证规则
+                addRules: {
+                    name: [
+                        { required: true, message: '请输入名称', trigger: 'blur' },
+                    ],
                 },
                 //列表数据
                 roleIndexData: {
@@ -123,6 +154,7 @@
                 //当前角色id
                 currentRoleId: 0,
                 privilegeGroup:[],
+                addDialogVisible:false,
             }
         },
         methods: {
@@ -159,13 +191,17 @@
                                     }
                                 }
                                 Vue.set(this.privilegeGroup,j,rolePriGroup);
-                                this.handleCheckedPrivilegeChange(j,this.privilegeGroup[j])
+                                // this.handleCheckedPrivilegeChange(j,this.privilegeGroup[j])
                             }
 
                         }
                     }
+                    for (let i in this.privilegeGroup){
+                        this.handleCheckedPrivilegeChange(i,this.privilegeGroup[i])
+                    }
                 });
                 this.currentRoleId = val.id;
+
             },
             handleSizeChange(size) {
                 this.queryParams.size = size;
@@ -212,6 +248,24 @@
                     }
                 }
             },
+            addRoleAction(){
+                this.addDialogVisible = true;
+            },
+            /**
+             * 关闭添加对话框
+             */
+            addHandleClose(){
+                this.addDialogVisible = false;
+            },
+            /**
+             * 添加对话框关闭完成后
+             */
+            addHandleClosed(){
+                this.addParams.name = '';
+            },
+            addCancelDialog(){
+                this.addDialogVisible = false;
+            }
         },
         mounted() {
             this.queryRoleIndex();

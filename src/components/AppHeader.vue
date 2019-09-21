@@ -57,7 +57,7 @@
 <style lang="scss">
     .app-header {
         height: 60px;
-        background: #409EFF;
+        background: #19426d;
         display: flex;
         flex-direction: row;
         line-height: 60px;
