@@ -26,7 +26,6 @@
 </template>
 
 <script>
-    console.log(process.env);
     import router from '../router';
     import { mapActions, mapState, mapGetters, mapMutations } from 'vuex';
     import RouterGenerator from '@/utils/generateRouter';
@@ -73,7 +72,7 @@
                 let routers = [];
                 //调用路由生成器
                 RouterGenerator(routers, this.menus);
-                //添加路由到/home 路由的children
+                //添加路由到 / 路由的children
                 router.options.routes[0].children = routers;
                 //注册路由
                 router.addRoutes(router.options.routes);
