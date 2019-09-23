@@ -26,6 +26,7 @@
 </template>
 
 <script>
+    console.log(process.env);
     import router from '../router';
     import { mapActions, mapState, mapGetters, mapMutations } from 'vuex';
     import RouterGenerator from '@/utils/generateRouter';

@@ -4,9 +4,9 @@ import user from '@/apis/modules/user';
 import role from '@/apis/modules/role';
 import privilege from '@/apis/modules/privilege';
 import store from '@/store';
-import appConfig from '@/config';
 
-axios.defaults.baseURL = appConfig.BaseURL;
+
+axios.defaults.baseURL = process.env.VUE_APP_URL;
 
 axios.interceptors.request.use(config => {
     const access_token = store.state.auth.access_token;
