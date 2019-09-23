@@ -58,7 +58,7 @@
                         <el-table-column
                                 label="操作">
                             <template slot-scope="scope">
-                                <i class="el-icon-edit-outline" @click="showAction(scope.$index)"></i>
+                                <el-button type="primary" icon="el-icon-edit" @click="showAction(scope.$index)"></el-button>
                             </template>
                         </el-table-column>
                     </el-table>

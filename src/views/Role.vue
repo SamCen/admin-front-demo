@@ -54,6 +54,13 @@
                                         label="角色名称"
                                         prop="name">
                                 </el-table-column>
+                                <el-table-column
+                                        label="操作">
+                                    <template slot-scope="scope">
+                                        <el-button type="primary" icon="el-icon-edit" @click="editRoleAction(scope.$index)"></el-button>
+                                        <el-button type="danger" icon="el-icon-delete" @click="deleteAction(scope.id)"></el-button>
+                                    </template>
+                                </el-table-column>
                             </el-table>
                             <div class="page-block">
                                 <el-pagination
@@ -110,6 +117,22 @@
                 </el-form-item>
             </el-form>
         </el-dialog>
+        <el-dialog
+                title="修改角色"
+                :visible.sync="editDialogVisible"
+                width="30%"
+                :before-close="editHandleClose"
+                @closed="editHandleClosed">
+            <el-form :model="editParams" :rules="editRules" ref="editForm" label-width="100px">
+                <el-form-item label="名称：" prop="name">
+                    <el-input v-model="editParams.name"></el-input>
+                </el-form-item>
+                <el-form-item label="" >
+                    <el-button @click="editCancelDialog">取 消</el-button>
+                    <el-button type="primary" @click="editRole">提交</el-button>
+                </el-form-item>
+            </el-form>
+        </el-dialog>
     </div>
 </template>
 
@@ -130,8 +153,19 @@
                 addParams:{
                     name:'',
                 },
+                //添加参数
+                editParams:{
+                    id:0,
+                    name:'',
+                },
                 //添加验证规则
                 addRules: {
+                    name: [
+                        { required: true, message: '请输入名称', trigger: 'blur' },
+                    ],
+                },
+                //修改验证规则
+                editRules: {
                     name: [
                         { required: true, message: '请输入名称', trigger: 'blur' },
                     ],
@@ -155,6 +189,7 @@
                 currentRoleId: 0,
                 privilegeGroup:[],
                 addDialogVisible:false,
+                editDialogVisible:false,
             }
         },
         methods: {
@@ -178,7 +213,8 @@
                 for (let i in this.privilegeGroup){
                     Vue.set(this.privilegeGroup,i,[]);
                 }
-                api.role.show(val.id).then(response => {
+                api.role.show(val.id,{with:'privilege'}).then(response => {
+                    this.editParams.name = response.data.data.name;
                     this.rolePrivilege = response.data.data.rolePrivileges;
                     for (let i in this.rolePrivilege){
                         for( let j in this.privilegeData){
@@ -191,7 +227,6 @@
                                     }
                                 }
                                 Vue.set(this.privilegeGroup,j,rolePriGroup);
-                                // this.handleCheckedPrivilegeChange(j,this.privilegeGroup[j])
                             }
 
                         }
@@ -248,6 +283,9 @@
                     }
                 }
             },
+            /**
+             * 打开添加对话框
+             */
             addRoleAction(){
                 this.addDialogVisible = true;
             },
@@ -263,8 +301,54 @@
             addHandleClosed(){
                 this.addParams.name = '';
             },
+            /**
+             * 取消添加对话框
+             */
             addCancelDialog(){
                 this.addDialogVisible = false;
+            },
+            /**
+             * 打开编辑对话框
+             */
+            editRoleAction(id){
+                this.addDialogVisible = true;
+                this.editParams.id = id;
+            },
+            /**
+             * 关闭编辑对话框
+             */
+            editHandleClose(){
+                this.addDialogVisible = false;
+            },
+            /**
+             * 编辑对话框关闭完成后
+             */
+            editHandleClosed(){
+                this.addParams.name = '';
+            },
+            /**
+             * 取消编辑对话框
+             */
+            editCancelDialog(){
+                this.addDialogVisible = false;
+            },
+            addRole(){
+                this.$refs['addForm'].validate((valid) => {
+                    if (valid) {
+                        api.role.create(this.addParams).then(response=>{
+                            this.$message.success('添加成功');
+                            this.queryRoleIndex();
+                            this.addParams = {
+                                name:'',
+                            };
+                            this.addDialogVisible = false;
+                        }).catch(err=>{
+                            this.$message.error('网络异常');
+                        })
+                    } else {
+                        this.$message.warning('资料不完善');
+                    }
+                });
             }
         },
         mounted() {

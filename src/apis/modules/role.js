@@ -12,13 +12,24 @@ export default {
         });
     },
 
+
+    /**
+     * 添加角色
+     * @param params
+     * @returns {AxiosPromise<any>}
+     */
+    create(params){
+        return axios.post('backend/role',params);
+    },
+
     /**
      * 角色详情
      * @param id
+     * @param params
      * @returns {AxiosPromise<any>}
      */
-    show(id){
-        return axios.get(`backend/role/${id}`)
+    show(id,params){
+        return axios.get(`backend/role/${id}`,{params})
     },
 
     /**
