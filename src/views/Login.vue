@@ -88,7 +88,7 @@
                 this.loading = false;
                 this.registerRouter();
                 this.$router.replace({
-                    path: '/'
+                    path: '/home'
                 })
             },
 

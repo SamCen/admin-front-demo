@@ -23,16 +23,16 @@ const router =  new Router({
                  * 验证用户是否登录
                  */
                 if (store.state["auth"].access_token) {
-                   next();
+                    next();
                 } else {
                     router.replace({
-                        path: '/login'
-                    })
+                        path: '/login',
+                    });
                 }
             },
             component: () => import(/* webpackChunkName: "index" */ '@/components/Main.vue'),
             children: [
-                ...dynamic
+                ...dynamic,
             ],
         },
         {
@@ -43,8 +43,8 @@ const router =  new Router({
                  */
                 if (store.state["auth"].access_token) {
                     router.replace({
-                        path: '/home'
-                    })
+                        path: '/home',
+                    });
                 } else {
                     next();
                 }
