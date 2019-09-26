@@ -12,7 +12,6 @@ export default {
         });
     },
 
-
     /**
      * 添加角色
      * @param params
@@ -25,11 +24,10 @@ export default {
     /**
      * 角色详情
      * @param id
-     * @param params
      * @returns {AxiosPromise<any>}
      */
-    show(id,params){
-        return axios.get(`backend/role/${id}`,{params})
+    show(id){
+        return axios.get(`backend/role/${id}`)
     },
 
     /**
@@ -41,4 +39,18 @@ export default {
     updatePri(id,renew){
         return axios.put(`backend/updatePri/${id}`,{renew})
     },
+
+    /**
+     * 更新角色基础信息
+     * @param id
+     * @param params
+     * @returns {AxiosPromise<any>}
+     */
+    update(id, params) {
+        return axios.put(`backend/role/${id}`,params)
+    },
+
+    delete(id){
+        return axios.delete(`backend/role/${id}`);
+    }
 }

@@ -18,7 +18,6 @@
                                     :data="roleIndexData.list"
                                     style="width: 100%;"
                                     highlight-current-row
-                                    @current-change="handleCurrentRowChange"
                             >
                                 <el-table-column type="expand">
                                     <template slot-scope="props">
@@ -57,8 +56,8 @@
                                 <el-table-column
                                         label="操作">
                                     <template slot-scope="scope">
-                                        <el-button type="primary" icon="el-icon-edit" @click="editRoleAction(scope.$index)"></el-button>
-                                        <el-button type="danger" icon="el-icon-delete" @click="deleteAction(scope.id)"></el-button>
+                                        <el-button type="primary" icon="el-icon-edit" @click="editRoleAction(scope.row.id)"></el-button>
+                                        <el-button type="danger" icon="el-icon-delete" @click="deleteAction(scope.row.id)"></el-button>
                                     </template>
                                 </el-table-column>
                             </el-table>
@@ -76,28 +75,6 @@
                         </el-card>
                     </el-col>
 
-                </el-row>
-                <br>
-                <el-row>
-                    <el-col :span="10" :offset="6">
-                        <el-card class="box-card">
-                            <el-row  v-for = "(item,index) in privilegeData" :key="index">
-                                <el-checkbox-group v-model="privilegeGroup[index]" @change="handleCheckedPrivilegeChange(index,privilegeGroup[index])">
-                                    <el-checkbox :label="item.code">{{item.name}}</el-checkbox>
-                                    <br>
-                                    <el-checkbox v-for = "(childItem,childIndex) in item.children" :key="childIndex" :label="childItem.code" :disabled="checkAble[index]">
-                                        {{childItem.name}}
-                                    </el-checkbox>
-                                </el-checkbox-group>
-                                <br>
-                            </el-row>
-                            <el-row>
-                                <el-col :span="8" :offset="16">
-                                    <el-button type="primary" @click="updateRolePrivilege">保存角色权限</el-button>
-                                </el-col>
-                            </el-row>
-                        </el-card>
-                    </el-col>
                 </el-row>
             </div>
         </el-card>
@@ -118,20 +95,43 @@
             </el-form>
         </el-dialog>
         <el-dialog
-                title="修改角色"
+                title="角色详情"
                 :visible.sync="editDialogVisible"
-                width="30%"
+                width="40%"
                 :before-close="editHandleClose"
                 @closed="editHandleClosed">
-            <el-form :model="editParams" :rules="editRules" ref="editForm" label-width="100px">
-                <el-form-item label="名称：" prop="name">
-                    <el-input v-model="editParams.name"></el-input>
-                </el-form-item>
-                <el-form-item label="" >
-                    <el-button @click="editCancelDialog">取 消</el-button>
-                    <el-button type="primary" @click="editRole">提交</el-button>
-                </el-form-item>
-            </el-form>
+            <el-tabs v-model="activeName" tab-position="left">
+                <el-tab-pane label="基础信息" name="info" >
+                    <el-form :model="editParams" :rules="editRules" ref="editForm" label-width="100px">
+                        <el-form-item label="名称：" prop="name">
+                            <el-input v-model="editParams.name"></el-input>
+                        </el-form-item>
+                        <el-form-item label="" >
+                            <el-button type="primary" @click="editRole()">修改角色基础信息</el-button>
+                        </el-form-item>
+                    </el-form>
+                </el-tab-pane>
+                <el-tab-pane label="权限管理" name="privilege">
+                    <el-card class="box-card">
+                        <el-row  v-for = "(item,index) in privilegeData" :key="index">
+                            <el-checkbox-group v-model="privilegeGroup[index]" @change="handleCheckedPrivilegeChange(index,privilegeGroup[index])">
+                                <el-checkbox :label="item.code">{{item.name}}</el-checkbox>
+                                <br>
+                                <el-checkbox v-for = "(childItem,childIndex) in item.children" :key="childIndex" :label="childItem.code" :disabled="checkAble[index]">
+                                    {{childItem.name}}
+                                </el-checkbox>
+                            </el-checkbox-group>
+                            <br>
+                        </el-row>
+                        <el-row>
+                            <el-col :span="8" :offset="16">
+                                <el-button type="primary" @click="updateRolePrivilege">保存角色权限</el-button>
+                            </el-col>
+                        </el-row>
+                    </el-card>
+                </el-tab-pane>
+            </el-tabs>
+
         </el-dialog>
     </div>
 </template>
@@ -143,6 +143,8 @@
         name: "Role",
         data() {
             return {
+                //详情选项卡默认值
+                activeName:'info',
                 //角色列表
                 queryParams: {
                     page: 1,
@@ -207,37 +209,6 @@
                     }
                 })
             },
-            handleCurrentRowChange(val) {
-                this.currentRoleId = 0;
-                this.rolePrivilege = [];
-                for (let i in this.privilegeGroup){
-                    Vue.set(this.privilegeGroup,i,[]);
-                }
-                api.role.show(val.id,{with:'privilege'}).then(response => {
-                    this.editParams.name = response.data.data.name;
-                    this.rolePrivilege = response.data.data.rolePrivileges;
-                    for (let i in this.rolePrivilege){
-                        for( let j in this.privilegeData){
-                            if(this.rolePrivilege[i].code === this.privilegeData[j].code){
-                                let rolePriGroup = [];
-                                rolePriGroup.push(this.rolePrivilege[i].code);
-                                if(this.rolePrivilege[i].children){
-                                    for (let k in this.rolePrivilege[i].children){
-                                        rolePriGroup.push(this.rolePrivilege[i].children[k].code);
-                                    }
-                                }
-                                Vue.set(this.privilegeGroup,j,rolePriGroup);
-                            }
-
-                        }
-                    }
-                    for (let i in this.privilegeGroup){
-                        this.handleCheckedPrivilegeChange(i,this.privilegeGroup[i])
-                    }
-                });
-                this.currentRoleId = val.id;
-
-            },
             handleSizeChange(size) {
                 this.queryParams.size = size;
                 this.queryRoleIndex();
@@ -259,7 +230,6 @@
                     this.$message.success('修改成功');
                 }).catch(err=>{
                     this.$message.error('修改失败');
-
                 });
             },
             handleCheckedPrivilegeChange(index,val){
@@ -311,27 +281,70 @@
              * 打开编辑对话框
              */
             editRoleAction(id){
-                this.addDialogVisible = true;
-                this.editParams.id = id;
+                this.rolePrivilege = [];
+                for (let i in this.privilegeGroup){
+                    Vue.set(this.privilegeGroup,i,[]);
+                }
+                api.role.show(id).then(response => {
+                    this.editParams.name = response.data.data.name;
+                    this.editParams.id = id;
+                    this.rolePrivilege = response.data.data.rolePrivileges;
+                    for (let i in this.rolePrivilege){
+                        for( let j in this.privilegeData){
+                            if(this.rolePrivilege[i].code === this.privilegeData[j].code){
+                                let rolePriGroup = [];
+                                rolePriGroup.push(this.rolePrivilege[i].code);
+                                if(this.rolePrivilege[i].children){
+                                    for (let k in this.rolePrivilege[i].children){
+                                        rolePriGroup.push(this.rolePrivilege[i].children[k].code);
+                                    }
+                                }
+                                Vue.set(this.privilegeGroup,j,rolePriGroup);
+                            }
+
+                        }
+                    }
+                    for (let i in this.privilegeGroup){
+                        this.handleCheckedPrivilegeChange(i,this.privilegeGroup[i])
+                    }
+                    this.editDialogVisible = true;
+                });
+            },
+            /**
+             * 编辑角色基础信息入库
+             */
+            editRole(){
+                this.$refs['editForm'].validate((valid) => {
+                    if (valid) {
+                        console.log(this.editParams.id);
+                        api.role.update(this.editParams.id,this.editParams).then(response=>{
+                            this.$message.success('修改成功');
+                            this.queryRoleIndex();
+                            this.editDialogVisible = false;
+                        }).catch(err=>{
+                            this.$message.error('网络异常');
+                        })
+                    } else {
+                        this.$message.warning('资料不完善');
+                    }
+                });
             },
             /**
              * 关闭编辑对话框
              */
             editHandleClose(){
-                this.addDialogVisible = false;
+                this.editDialogVisible = false;
             },
             /**
              * 编辑对话框关闭完成后
              */
             editHandleClosed(){
                 this.addParams.name = '';
+                this.activeName = 'info';
             },
             /**
-             * 取消编辑对话框
+             * 添加角色入库
              */
-            editCancelDialog(){
-                this.addDialogVisible = false;
-            },
             addRole(){
                 this.$refs['addForm'].validate((valid) => {
                     if (valid) {
@@ -349,7 +362,14 @@
                         this.$message.warning('资料不完善');
                     }
                 });
-            }
+            },
+            deleteAction(id){
+                api.role.delete(id).then(response=>{
+                    this.$message.success('删除成功');
+                }).catch(err=>{
+                    this.$message.error(err.response.data.msg);
+                })
+            },
         },
         mounted() {
             this.queryRoleIndex();
