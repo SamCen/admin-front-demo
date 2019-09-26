@@ -366,6 +366,7 @@
             deleteAction(id){
                 api.role.delete(id).then(response=>{
                     this.$message.success('删除成功');
+                    this.queryRoleIndex();
                 }).catch(err=>{
                     this.$message.error(err.response.data.msg);
                 })
