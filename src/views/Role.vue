@@ -14,6 +14,7 @@
                     <el-col :span="10" :offset="6">
                         <el-card class="box-card">
                             <el-table
+                                    v-loading="indexLoading"
                                     border
                                     :data="roleIndexData.list"
                                     style="width: 100%;"
@@ -143,6 +144,8 @@
         name: "Role",
         data() {
             return {
+                //列表加载
+                indexLoading: false,
                 //详情选项卡默认值
                 activeName:'info',
                 //角色列表
@@ -196,17 +199,21 @@
         },
         methods: {
             queryRoleIndex() {
+                this.indexLoading = true;
                 api.role.index(this.queryParams).then(response => {
                     this.roleIndexData = response.data.data;
+                    this.indexLoading = false;
                 })
             },
             queryPrivilegeIndex() {
                 api.privilege.index().then(response => {
+                    this.indexLoading = true;
                     this.privilegeData = response.data.data;
                     for (let i = 0;i < this.privilegeData.length;i++ ){
                         this.privilegeGroup[i] = [];
                         this.checkAble[i] = true;
                     }
+                    this.indexLoading = false;
                 })
             },
             handleSizeChange(size) {
@@ -226,7 +233,10 @@
                 for (let i in this.privilegeGroup){
                     temp = temp.concat(this.privilegeGroup[i]);
                 }
+                this.indexLoading = true;
                 api.role.updatePri(this.currentRoleId,temp).then(response=>{
+                    this.editDialogVisible = false;
+                    this.indexLoading = false;
                     this.$message.success('修改成功');
                 }).catch(err=>{
                     this.$message.error('修改失败');
@@ -308,12 +318,15 @@
                         this.handleCheckedPrivilegeChange(i,this.privilegeGroup[i])
                     }
                     this.editDialogVisible = true;
+                }).catch(err=>{
+                    this.$message.error('网络异常');
                 });
             },
             /**
              * 编辑角色基础信息入库
              */
             editRole(){
+                this.indexLoading = true;
                 this.$refs['editForm'].validate((valid) => {
                     if (valid) {
                         console.log(this.editParams.id);
@@ -321,7 +334,9 @@
                             this.$message.success('修改成功');
                             this.queryRoleIndex();
                             this.editDialogVisible = false;
+                            this.indexLoading = false;
                         }).catch(err=>{
+                            this.indexLoading = false;
                             this.$message.error('网络异常');
                         })
                     } else {
@@ -346,6 +361,7 @@
              * 添加角色入库
              */
             addRole(){
+                this.indexLoading = true;
                 this.$refs['addForm'].validate((valid) => {
                     if (valid) {
                         api.role.create(this.addParams).then(response=>{
@@ -354,8 +370,10 @@
                             this.addParams = {
                                 name:'',
                             };
+                            this.indexLoading = false;
                             this.addDialogVisible = false;
                         }).catch(err=>{
+                            this.indexLoading = false;
                             this.$message.error('网络异常');
                         })
                     } else {
