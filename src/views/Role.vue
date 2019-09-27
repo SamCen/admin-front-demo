@@ -190,8 +190,6 @@
                 privilegeData: [],
                 //当前角色的权限
                 rolePrivilege: [],
-                //当前角色id
-                currentRoleId: 0,
                 privilegeGroup:[],
                 addDialogVisible:false,
                 editDialogVisible:false,
@@ -225,16 +223,12 @@
                 this.queryRoleIndex();
             },
             updateRolePrivilege() {
-                if(this.currentRoleId === 0){
-                    this.$message.warning('请选择角色');
-                    return false;
-                }
                 let temp = [];
                 for (let i in this.privilegeGroup){
                     temp = temp.concat(this.privilegeGroup[i]);
                 }
                 this.indexLoading = true;
-                api.role.updatePri(this.currentRoleId,temp).then(response=>{
+                api.role.updatePri(this.editParams.id,temp).then(response=>{
                     this.editDialogVisible = false;
                     this.indexLoading = false;
                     this.$message.success('修改成功');
@@ -354,7 +348,11 @@
              * 编辑对话框关闭完成后
              */
             editHandleClosed(){
-                this.addParams.name = '';
+                this.editParams = {
+                    id:0,
+                    name:'',
+                };
+                this.editParams.name = '';
                 this.activeName = 'info';
             },
             /**
